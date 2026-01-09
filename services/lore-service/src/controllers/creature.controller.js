@@ -1,4 +1,6 @@
 const Creature = require('../models/creature.model');
+const Testimony = require("../models/testimony.model");
+
 
 async function createCreature(req, res) {
     try {
@@ -12,27 +14,63 @@ async function createCreature(req, res) {
 }
 
 async function getAllCreature(req, res) {
-    try{
-        const creatures = await
-    Creature.find();
-        return res.json(creatures);
-    } catch (error) {
-        return handleCreatureError(res, error);
-    }
+  try {
+    const creatures = await Creature.find();
+
+    const creaturesWithScore = await Promise.all(
+      creatures.map(async (c) => {
+        const validatedCount = await Testimony.countDocuments({
+          creatureId: c._id,
+          status: "VALIDATED",
+        });
+
+        const sort = req.query.sort;
+
+        if (sort === "legendScore") {
+            creatures.sort((a, b) => b.legendScore - a.legendScore);
+        }
+
+        const legendScore = 1 + validatedCount / 5;
+
+        return {
+          ...c.toObject(),
+          legendScore,
+          validatedCount,
+        };
+      })
+    );
+
+    return res.json(creaturesWithScore);
+  } catch (error) {
+    return handleCreatureError(res, error);
+  }
 }
 
+
 async function getCreatureById(req, res) {
-    try {
-        const creature = await
-    Creature.findById(req.params.id);
-        if (!creature) {
-            return res.status(404).json({ message: 'Creature non trouvée' });
-        }
-        return res.json(creature);
-    } catch (error) {
-        return handleCreatureError(res, error);
-    }   
+  try {
+    const creature = await Creature.findById(req.params.id);
+    if (!creature) {
+      return res.status(404).json({ message: "Creature non trouvée" });
+    }
+
+    const validatedCount = await Testimony.countDocuments({
+      creatureId: creature._id,
+      status: "VALIDATED",
+    });
+
+    const legendScore = 1 + validatedCount / 5;
+
+    return res.json({
+      ...creature.toObject(),
+      legendScore,
+      validatedCount,
+    });
+  } catch (error) {
+    return handleCreatureError(res, error);
+  }
 }
+
 
 async function updateCreature(req, res) {
     try {
