@@ -10,7 +10,7 @@ module.exports = function requireAuth(req, res, next) {
 
   try {
     const token = auth.split(" ")[1];
-    req.user = verifyToken(token); // { id, role }
+    req.user = verifyToken(token); 
     next();
   } catch {
     return res.status(401).json({ error: "Invalid token" });

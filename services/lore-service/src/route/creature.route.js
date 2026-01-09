@@ -6,11 +6,11 @@ require('../controllers/creature.controller');
 
 //Create
 
-router.post('/', creatureController.createCreature);
+router.post("/", creatureController.createCreature);
 
 //ensuite Read all
 
-router.get('/:id', creatureController.getAllCreature);
+router.get('/', creatureController.getAllCreature);
 
 // Read one
 

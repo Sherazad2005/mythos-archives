@@ -10,26 +10,22 @@ function ensureMongoUriExists(uri) {
     }
 }
 
-function getMongoOptions() {
-    return {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    };
-}
 
 function loginSucceed() {
     console.log(' MongoDB connecté (lore-service)');
+}
+function handleConnectError(error) {
+    console.error('Erreur de connexion à MongoDB :', error);
+    process.exit(1);
 }
 
 async function connectDB() {
     try {
         const uri = getMongoUri();
 
-        doesMongoUriExist(uri);
+        ensureMongoUriExists(uri);
 
-        const options = getMongoOptions();
-
-        await mongoose.connect(uri, options);
+        await mongoose.connect(uri);
 
         loginSucceed();
 
@@ -40,4 +36,4 @@ async function connectDB() {
     }
 }
 
-moodule.exports = connectDB;
+module.exports = connectDB;

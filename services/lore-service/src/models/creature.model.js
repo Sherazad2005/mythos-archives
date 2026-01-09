@@ -19,7 +19,7 @@ function buildCreatureSchema() {
         },
         createdAt: {
             type: Date,
-            degault: Date.now,
+            default: Date.now,
         },
     });
 }

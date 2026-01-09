@@ -1,7 +1,6 @@
-const Creature =
-require('../models/creature.model');
+const Creature = require('../models/creature.model');
 
-async function creatCreature(req, res) {
+async function createCreature(req, res) {
     try {
         const data = pickCreatureData(req.body);
         const creature = await 
@@ -12,11 +11,12 @@ async function creatCreature(req, res) {
     }
 }
 
-async function getAllCreatureError(req, res) {
-    try {
-        const creatures = await Creature.find();
-        return res.json(creature);
-    }catch (error) {
+async function getAllCreature(req, res) {
+    try{
+        const creatures = await
+    Creature.find();
+        return res.json(creatures);
+    } catch (error) {
         return handleCreatureError(res, error);
     }
 }
@@ -52,6 +52,18 @@ async function updateCreature(req, res) {
     }
 }
 
+async function deleteCreature(req, res) {
+    try {
+        const creature = await Creature.findByIdAndDelete(req.params.id);
+        if (!creature) {
+            return res.status(404).json({ message: 'Creature non trouvée' });
+        }
+        return res.status(200).end();
+    } catch (error) {
+        return handleCreatureError(res, error);
+    }
+}
+
 /* Petites fonctions utilitaires */
 
 function pickCreatureData(body) {
@@ -63,7 +75,7 @@ function pickCreatureData(body) {
 }
 
 function handleCreatureError(res, error) {
-    console.error('Creature error:', error.meesage);
+    console.error('Creature error:', error.message);
 
     if (error.name === 'ValidationError') {
         return res.status(400).json({ message: error.message });
@@ -73,7 +85,7 @@ function handleCreatureError(res, error) {
         return res.status(400).json({ message: 'The creature name is already used' });
     }
 
-    return res.stat(500).json({ message: 'Erreur serveur' });
+    return res.status(500).json({ message: 'Erreur serveur' });
 }
 
 module.exports = {

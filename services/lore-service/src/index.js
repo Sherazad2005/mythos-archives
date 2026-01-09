@@ -1,18 +1,20 @@
+require("dotenv").config();
 const express = require ('express');
 const connectDB = require ('./config/db');
-const creatureRoutes = require('./routes/creature.routes');
+const creatureRoutes = require("./route/creature.route");
 
-const app = expresss();
+const app = express();
 
 //pour lire le json dans le reqbody 
 
 app.use(express.json());
 
+//connexion a la db
 connectDB();
 
-//api pourl les creatures a recup
+// routes
 
-app.use('/api/creatures', creatureRoutes);
+app.use("/creatures", creatureRoutes);
 
 const  PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {
