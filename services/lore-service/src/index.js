@@ -20,3 +20,7 @@ const  PORT = process.env.PORT || 4001;
 app.listen(PORT, () => {
     console.log(`Lore-service running on port ${PORT}`);
 });
+
+const testimonyRoutes = require('./routes/testimony.routes');
+
+app.use('/api/testimonies', testimonyRoutes);
