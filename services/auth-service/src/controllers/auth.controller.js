@@ -7,7 +7,6 @@ module.exports = {
       const result = await authService.register(req.body);
       return res.status(201).json(result);
     } catch (e) {
-      // email/username déjà pris
       if (e.code === "P2002") return res.status(409).json({ error: "Email or username already exists" });
       return next(e);
     }
