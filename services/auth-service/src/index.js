@@ -5,6 +5,8 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth.routes");
 const adminRoutes = require("./routes/admin.routes");
 const usersRoutes = require("./routes/users.routes");
+const internalRoutes = require("./routes/internal.routes");
+
 
 const app = express();
 app.use(cors());
@@ -15,6 +17,8 @@ app.get("/health", (req, res) => res.json({ ok: true, service: "auth-service" })
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/users", usersRoutes);
+app.use("/internal", internalRoutes);
+
 
 app.use((err, req, res, next) => {
   console.error(err);

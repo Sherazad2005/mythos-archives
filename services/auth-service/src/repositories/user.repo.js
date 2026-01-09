@@ -18,5 +18,13 @@ module.exports = {
   updateRole(id, role) {
     return prisma.user.update({ where: { id }, data: { role } });
   },
+
+  updateReputationAndRole(id, reputation, role) {
+  return prisma.user.update({
+    where: { id },
+    data: { reputation, role },
+  });
+},
+
 };
 
