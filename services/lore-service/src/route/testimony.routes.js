@@ -1,13 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const testimonyController = require('../controllers/testimony.controllers');
 
-router.post('/', testimonyController.createTestimony);
+const ctrl = require("../controllers/testimony.controllers");
 
-router.get('/', testimonyController.getAllTestimonies);
 
-router.put('/:id/validate', testimonyController.validateTestimony);
+const verifyTokenViaAuth = require("../middlewares/verifyTokenViaAuth");
+const requireRole = require("../middlewares/requireRole");
 
-router.put('/:id/reject', testimonyController.rejectTestimony);
+
+router.post("/", verifyTokenViaAuth, ctrl.creatTestimony);
+
+
+router.get("/", ctrl.getAllTestimonyFilter);
+
+
+router.put("/:id/validate", verifyTokenViaAuth, requireRole("EXPERT", "ADMIN"), ctrl.validateTestimony);
+router.put("/:id/reject", verifyTokenViaAuth, requireRole("EXPERT", "ADMIN"), ctrl.rejectTestimony);
 
 module.exports = router;

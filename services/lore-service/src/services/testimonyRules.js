@@ -17,11 +17,14 @@ if (testimonyRecent) {
     throw new Error('Attends 5 min entre 2 testimonies please');
 
 }
+}
 
 //règle 2 un user peut pas valider son propre témoignage
 
 function noSelfValidation(testimony, userId) {
-    if(testimony.submittedBy && testimony.submittedBy.toString() === userId.toString())
+    if(
+        testimony.submittedBy &&
+         testimony.submittedBy.toString() === userId.toString()){
         throw new Error('Impossible de valider son propre témoignage!!!');
 
 }

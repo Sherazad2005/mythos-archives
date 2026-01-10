@@ -1,5 +1,6 @@
-const Testimony = require('../models/creature.model');
-const Creature = require('../models/creature.model');
+const Testimony = require("../models/testimony.model");
+const Creature = require("../models/creature.model");
+
 const {
     checkFiveBetweenTestimony,
     noSelfValidation,
@@ -7,15 +8,21 @@ const {
 
 // créer un témoignage
 async function creatTestimony(req, res) {
-    try{
-        const userId = getUserIdFromRequestr(req);
-        await checkFiveBetweenTestimony(userId);
+  try {
+    const userId = getUserIdFromRequest(req);
+    if (!userId) return res.status(401).json({ message: "Accès refusé : token manquant" });
 
-        const data = buildTestimonyData(req.body, userId);
-    } catch(error) {
-        return handleTestimonyError(res, error);
-    }
+    await checkFiveBetweenTestimony(userId); 
+
+    const data = buildTestimonyData(req.body, userId);
+    const testimony = await Testimony.create(data);
+    return res.status(201).json(testimony);
+  } catch (error) {
+    return handleTestimonyError(res, error);
+  }
 }
+
+
 
 // lire tous les témoignage
 async function getAllTestimonyFilter(req, res) {
@@ -35,7 +42,9 @@ async function validateTestimony(req, res) {
         const testimony = await findTestimonyOr404(req.params.id, res);
         
         if (!testimony) return;
-        noSelfValidation(testimony, userId); await applyValidationOnTestimony(testimony, userId); await incrementCreatureEvolution(testimony.creatureId);
+        noSelfValidation(testimony, userId);
+        await applyValidationOnTestimony(testimony, userId); 
+        await incrementCreatureEvolution(testimony.creatureId);
 
         return res.json (testimony);
     }catch (error) {
@@ -52,9 +61,9 @@ async function rejectTestimony(req, res) {
 
         noSelfValidation(testimony, userId);
 
-        testimony.status = 'rejected';
+        testimony.status = "REJECTED";
         testimony.validatedBy = userId;
-        testimony.validationTime = new Date();
+        testimony.validatedAt  = new Date();
         await testimony.save();
 
         return res.json(testimony);
@@ -65,23 +74,28 @@ async function rejectTestimony(req, res) {
 
 //autres fonctions utilitaires comme avec creature controller
 
-function getUserIdFromRequest(req){
-    return req.user ? req.user._id : null;
+function getUserIdFromRequest(req) {
+  const id = req.user?.id;
+  return id ? Number(id) : null;
 }
+
 
 function buildTestimonyData(body, userId) {
     return{
         creatureId: body.creatureId,
+        authorId: userId,
         description: body.description,
-        location: body.location,
-        WitnessName: body.WitnessName,
-        submittedBy:userId,
+        status: "PENDING",
+        validatedBy: null,
+        validatedAt: null,
         };
 }
 
 function buildTestimonyFilter(query) {
-    const filter = {;
-        if (query.status) filter.status = query.creatureId;
+    const filter = {};
+        if (query.status) filter.status = query.status;
+        if (query.creatureId) filter.creatureId = query.creatureId;
+        if (query.authorId) filter.authorId = Number(query.authorId);
         return filter;
     }
     async function findTestimonyOr404(id, res) {
@@ -94,9 +108,9 @@ function buildTestimonyFilter(query) {
     }
 
     async function applyValidationOnTestimony(testimony, userId) {
-        testimony.status = 'validated';
+        testimony.status = 'VALIDATED';
         testimony.validatedBy = userId;
-        testimony.validationTime = new Date();
+        testimony.validatedAt  = new Date();
         await testimony.save();
     }
 
@@ -119,8 +133,8 @@ function buildTestimonyFilter(query) {
     }
 
     module.exports = {
-        createTestimony,
-        getAllTestimonies,
+        creatTestimony,
+        getAllTestimonyFilter,
         validateTestimony,
         rejectTestimony,
     };
