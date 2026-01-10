@@ -45,7 +45,9 @@ async function validateTestimony(req, res) {
         if (!testimony) return;
         noSelfValidation(testimony, userId);
         await applyValidationOnTestimony(testimony, userId); 
-        await addReputation(testimony.authorId, +10);
+        let delta =3;
+        if (req.user.role === "EXPERT") delta += 1;
+        await addReputation(testimony.authorId, delta);
         await incrementCreatureEvolution(testimony.creatureId);
 
         return res.json (testimony);
@@ -67,7 +69,7 @@ async function rejectTestimony(req, res) {
         testimony.validatedBy = userId;
         testimony.validatedAt  = new Date();
         await testimony.save();
-        await addReputation(testimony.authorId, -5);
+        await addReputation(testimony.authorId, -1);
 
         return res.json(testimony);
     }catch (error) {

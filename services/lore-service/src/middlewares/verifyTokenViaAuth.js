@@ -18,7 +18,7 @@ async function verifyTokenViaAuth(req, res, next) {
     req.user = { id: data.id, role: data.role };
     return next();
   } catch (err) {
-    // Si auth-service renvoie 404, on le verra ici et on renverra 401 côté lore
+   
     return res.status(401).json({ error: "Invalid token" });
   }
 }
