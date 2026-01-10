@@ -1,24 +1,26 @@
-const axios = require('axios');
+const axios = require("axios");
 
 async function verifyTokenViaAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
 
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).json({ message: 'Accès refusé : token manquant' });
-    }
+  if (!authHeader?.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Missing Bearer token" });
+  }
 
-    try {
-        const response = await axios.get('http://localhost:4000/auth/me', {
-            headers: {
-                Authorization: authHeader},
-                timeout: 5000,
-            
-        });
-        req.user = response.data;
+  const baseUrl = process.env.AUTH_SERVICE_URL || "http://localhost:4000";
 
-        return next();
-    } catch (error) {
-        return res.status(401).json({ message: 'Accès refusé : token invalide' });
-    }
+  try {
+    const { data } = await axios.get(`${baseUrl}/auth/me`, {
+      headers: { Authorization: authHeader },
+      timeout: 5000,
+    });
+
+    req.user = { id: data.id, role: data.role };
+    return next();
+  } catch (err) {
+    // Si auth-service renvoie 404, on le verra ici et on renverra 401 côté lore
+    return res.status(401).json({ error: "Invalid token" });
+  }
 }
+
 module.exports = verifyTokenViaAuth;

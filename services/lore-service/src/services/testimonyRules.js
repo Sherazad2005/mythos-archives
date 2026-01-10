@@ -9,7 +9,7 @@ async function checkFiveBetweenTestimony(userId) {
 const fiveMinAgo =  new Date(Date.now() - 5 * 60 * 1000);
 
 const testimonyRecent = await Testimony.findOne({
-    submittedBy: userId,
+    authorId: userId,
     createdAt: { $gte: fiveMinAgo },
 });
 
@@ -22,9 +22,7 @@ if (testimonyRecent) {
 //règle 2 un user peut pas valider son propre témoignage
 
 function noSelfValidation(testimony, userId) {
-    if(
-        testimony.submittedBy &&
-         testimony.submittedBy.toString() === userId.toString()){
+    if (testimony.authorId && testimony.authorId === userId){
         throw new Error('Impossible de valider son propre témoignage!!!');
 
 }

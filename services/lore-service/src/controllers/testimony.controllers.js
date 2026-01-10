@@ -1,5 +1,6 @@
 const Testimony = require("../models/testimony.model");
 const Creature = require("../models/creature.model");
+const { addReputation } = require("../services/authClient");
 
 const {
     checkFiveBetweenTestimony,
@@ -44,6 +45,7 @@ async function validateTestimony(req, res) {
         if (!testimony) return;
         noSelfValidation(testimony, userId);
         await applyValidationOnTestimony(testimony, userId); 
+        await addReputation(testimony.authorId, +10);
         await incrementCreatureEvolution(testimony.creatureId);
 
         return res.json (testimony);
@@ -65,6 +67,7 @@ async function rejectTestimony(req, res) {
         testimony.validatedBy = userId;
         testimony.validatedAt  = new Date();
         await testimony.save();
+        await addReputation(testimony.authorId, -5);
 
         return res.json(testimony);
     }catch (error) {

@@ -1,8 +1,8 @@
 const verifyTokenViaAuth = require("../middlewares/verifyTokenViaAuth");
 const express = require('express');
 const router = express.Router();
-const creatureController = 
-require('../controllers/creature.controller');
+const creatureController = require("../controllers/creature.controller");
+
 
 
 //Create
