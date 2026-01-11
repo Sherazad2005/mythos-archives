@@ -133,6 +133,15 @@ Prisma ORM (SQLite)
 bcrypt ( hachage des mots de passe)
 jsonwebtoken (JWT)
 
+## Récap des microservices
+
+| Service            | Port | Rôle principal |
+|--------------------|------|----------------|
+| auth-service       | 4000 | Authentification, rôles, réputation |
+| lore-service       | 4001 | Créatures, témoignages, statistiques |
+| mythology-service | 4002 | Analyse et classification |
+
+
 Cette partie à été géré par Sherazade
 
 
@@ -328,4 +337,15 @@ MongoDB (créatures, témoignages).
 Logique métier de validation, scores et statistiques
 
 Partie réalisé par Sidy
+
+## Scénario de test recommandé
+
+1. Créer un utilisateur (USER) via `POST /auth/register`
+2. Se connecter via `POST /auth/login` → récupérer le token JWT
+3. Créer une créature via `POST /creatures`
+4. Créer un témoignage via `POST /testimonies`
+5. Valider le témoignage avec un utilisateur EXPERT ou ADMIN
+6. Vérifier la réputation avec `GET /auth/me`
+7. Consulter les statistiques via `GET /stats/*`
+
   
