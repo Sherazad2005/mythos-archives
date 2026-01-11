@@ -10,4 +10,8 @@ router.get("/average", verifyTokenViaAuth, requireRole("EXPERT", "ADMIN"),ctrl.a
 router.get("/top", verifyTokenViaAuth, requireRole("EXPERT", "ADMIN"), ctrl.topCreaturesByTestimonies);
 
 router.get("/status", verifyTokenViaAuth, requireRole("EXPERT", "ADMIN"), ctrl.testimonyStatusDistribution);
+
+router.get("/summary", verifyTokenViaAuth, requireRole("EXPERT", "ADMIN"), ctrl.globalSummary);
+
+router.get("/keywords", verifyTokenViaAuth, requireRole("EXPERT", "ADMIN"), ctrl.topKeywords);
 module.exports = router;

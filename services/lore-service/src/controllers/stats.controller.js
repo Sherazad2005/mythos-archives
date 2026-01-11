@@ -46,9 +46,65 @@ async function testimonyStatusDistribution(req, res) {
   res.json(result);
 }
 
+async function globalSummary(req, res) {
+  const totalCreatures = await Creature.countDocuments();
+  const totalTestimonies = await Testimony.countDocuments();
+
+  const byStatus = await Testimony.aggregate([
+    { $group: { _id: "$status", count: { $sum: 1 } } }
+  ]);
+
+  const statuses = { PENDING: 0, VALIDATED: 0, REJECTED: 0 };
+  for (const r of byStatus) statuses[r._id] = r.count;
+
+  res.json({
+    totalCreatures,
+    totalTestimonies,
+    statuses,
+  });
+}
+
+async function topKeywords(req, res) {
+  const limit = Number(req.query.limit || 10);
+
+  const rows = await Testimony.aggregate([
+    {
+      $project: {
+        words: {
+          $split: [
+            { $toLower: "$description" },
+            " "
+          ]
+        }
+      }
+    },
+    { $unwind: "$words" },
+    {
+      $match: {
+        words: {
+          $regex: /^[a-zàâçéèêëîïôûùüÿñæœ]+$/
+        }
+      }
+    },
+    {
+      $group: {
+        _id: "$words",
+        count: { $sum: 1 }
+      }
+    },
+    { $sort: { count: -1 } },
+    { $limit: limit }
+  ]);
+
+  res.json(rows);
+}
+
+
 module.exports = {
   occurrencesByCreature,
   averageTestimoniesPerCreature,
   topCreaturesByTestimonies,
   testimonyStatusDistribution,
+  globalSummary,
+  topKeywords,
 };
